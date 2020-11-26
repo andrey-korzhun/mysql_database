@@ -1,4 +1,12 @@
--- Выводим названия статей для которых есть ключевые слова, а также их описание
+-- С‚РѕРї-10 Р·Р°РїРёСЃРµР№ СЃ РЅР°РёР±РѕР»СЊС€РёРј РєРѕР»РёС‡РµСЃС‚РІРѕРј РєР»СЋС‡РµРІС‹С… СЃР»РѕРІ
+SELECT title, COUNT(kws.id) words_number
+	FROM notes AS n
+		LEFT JOIN key_words_sets AS kws
+			   ON n.id = kws.note_id
+		 GROUP BY n.id
+		 ORDER BY words_number DESC LIMIT 10;
+
+-- Р’С‹РІРѕРґРёРј РЅР°Р·РІР°РЅРёСЏ СЃС‚Р°С‚РµР№ РґР»СЏ РєРѕС‚РѕСЂС‹С… РµСЃС‚СЊ РєР»СЋС‡РµРІС‹Рµ СЃР»РѕРІР°, Р° С‚Р°РєР¶Рµ РёС… РѕРїРёСЃР°РЅРёРµ
 CREATE OR REPLACE VIEW words_list AS
 	SELECT n.id, n.title,
 		(SELECT GROUP_CONCAT(word SEPARATOR ' / ')
@@ -16,7 +24,7 @@ CREATE OR REPLACE VIEW words_list AS
 		
 SELECT * FROM words_list ORDER BY id;
 
--- Считаем сколько записей в каждой профессиональной области
+-- РЎС‡РёС‚Р°РµРј СЃРєРѕР»СЊРєРѕ Р·Р°РїРёСЃРµР№ РІ РєР°Р¶РґРѕР№ РїСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅРѕР№ РѕР±Р»Р°СЃС‚Рё
 CREATE OR REPLACE VIEW professional_fields_total AS
 	SELECT name AS 'Field',
 	COUNT(notes.professional_field_id)
@@ -27,23 +35,15 @@ CREATE OR REPLACE VIEW professional_fields_total AS
 		 
 SELECT * FROM professional_fields_total;
 
--- Выводим заголовок, ссылку и описание для записей из области Статистики
+-- Р’С‹РІРѕРґРёРј Р·Р°РіРѕР»РѕРІРѕРє, СЃСЃС‹Р»РєСѓ Рё РѕРїРёСЃР°РЅРёРµ РґР»СЏ Р·Р°РїРёСЃРµР№ РёР· РѕР±Р»Р°СЃС‚Рё РЎС‚Р°С‚РёСЃС‚РёРєРё
 SELECT title, link, description,
 	name AS 'Field'
 	FROM notes
 		JOIN professional_fields
 		  ON professional_fields.id = notes.professional_field_id
 	   WHERE name = "Statistics";
-		  
--- топ-10 записей с наибольшим количеством ключевых слов
-SELECT title, COUNT(kws.id) words_number
-	FROM notes AS n
-		LEFT JOIN key_words_sets AS kws
-			   ON n.id = kws.note_id
-		 GROUP BY n.id
-		 ORDER BY words_number DESC LIMIT 10;
 
--- Вывод типов ресурсов со ссылками по ключевому слову 'Python' (на русском) 
+-- Р’С‹РІРѕРґ С‚РёРїРѕРІ СЂРµСЃСѓСЂСЃРѕРІ СЃРѕ СЃСЃС‹Р»РєР°РјРё РїРѕ РєР»СЋС‡РµРІРѕРјСѓ СЃР»РѕРІСѓ 'Python' (РЅР° СЂСѓСЃСЃРєРѕРј) 
 SELECT nn.title, pt.name AS 'type', nn.link, nn.`language`
 	FROM notes AS nn
  	JOIN key_words_sets AS kws
